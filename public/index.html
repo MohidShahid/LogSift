@@ -7,10 +7,113 @@
 
   <h1>Upload Log File</h1>
 
-  <form action="/upload" method="POST" enctype="multipart/form-data">
-    <input type="file" name="logfile" />
-    <button type="submit">Analyze</button>
-  </form>
+  <div id="uploadSection">
+    <input type="file" id="file" />
+    <button type="button" onclick="upload()">Analyze</button>
+  </div>
+
+  <div id="results" style="display:none;">
+    <h2>Report</h2>
+
+    <h3>Top IPs</h3>
+    <table border="1" id="ipsTable"></table>
+
+    <h3>Most Hitted Endpoints</h3>
+    <table border="1" id="hitsTable"></table>
+
+    <h3>Most Error Endpoints</h3>
+    <table border="1" id="errorsTable"></table>
+  </div>
+
+<script>
+
+async function upload() {
+
+  const fileInput = document.getElementById("file");
+
+  const formData = new FormData();
+  formData.append("logfile", fileInput.files[0]);
+
+  const res = await fetch("/upload", {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await res.json();
+
+  console.log(data);
+
+  // hide upload section
+  document.getElementById("uploadSection").style.display = "none";
+
+  // show results section
+  document.getElementById("results").style.display = "block";
+
+  // =========================
+  // TOP IPS TABLE
+  // =========================
+  let ipHTML = `
+    <tr>
+      <th>IP Address</th>
+      <th>Requests</th>
+    </tr>
+  `;
+
+  data.highestRequestedIp.forEach(([ip, count]) => {
+    ipHTML += `
+      <tr>
+        <td>${ip}</td>
+        <td>${count}</td>
+      </tr>
+    `;
+  });
+
+  document.getElementById("ipsTable").innerHTML = ipHTML;
+
+  // =========================
+  // MOST HITTED ENDPOINTS
+  // =========================
+  let hitsHTML = `
+    <tr>
+      <th>Endpoint</th>
+      <th>Hits</th>
+    </tr>
+  `;
+
+  data.mostHittedEndpoints.forEach(item => {
+    hitsHTML += `
+      <tr>
+        <td>${item.path}</td>
+        <td>${item.hits}</td>
+      </tr>
+    `;
+  });
+
+  document.getElementById("hitsTable").innerHTML = hitsHTML;
+
+  // =========================
+  // MOST ERROR ENDPOINTS
+  // =========================
+  let errorHTML = `
+    <tr>
+      <th>Endpoint</th>
+      <th>Errors</th>
+    </tr>
+  `;
+
+  data.mostErrorsEndpoints.forEach(item => {
+    errorHTML += `
+      <tr>
+        <td>${item.path}</td>
+        <td>${item.errors}</td>
+      </tr>
+    `;
+  });
+
+  document.getElementById("errorsTable").innerHTML = errorHTML;
+}
+
+</script>
 
 </body>
 </html>
