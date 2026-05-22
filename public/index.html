@@ -14,7 +14,9 @@
 
   <div id="results" style="display:none;">
     <h2>Report</h2>
-
+    <h3>Total Lines: <span class="totalLog"></span></h3>
+    <h3>Parsed Lines: <span class="parsedlog"></span></h3>
+    <h3>Malformed Lines: <span class="malformedlog"></span></h3>
     <h3>Top IPs</h3>
     <table border="1" id="ipsTable"></table>
 
@@ -111,6 +113,9 @@ async function upload() {
   });
 
   document.getElementById("errorsTable").innerHTML = errorHTML;
+  document.getElementsByClassName("totalLog")[0].textContent = data.totalLines;
+  document.getElementsByClassName("parsedlog")[0].textContent = data.parsedLines;
+  document.getElementsByClassName("malformedlog")[0].textContent = data.malformedLines;
 }
 
 </script>
